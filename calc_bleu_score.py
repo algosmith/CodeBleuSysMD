@@ -18,8 +18,8 @@ gamma = 0.33
 #args = parser.parse_args()
 
 # preprocess inputs
-candidate = 'LaptopParts::Keyboard hasA\nValue layout: String = \"QWERTY\",\nValue backlight: Boolean = true,\nValue language: String = \"English-US\".'
-reference = 'LaptopParts::Keyboard hasA\nValue layout: String = \"QWERTY\",\nValue backlight: Boolean = true,\nValue language: String = \"English-US\".'
+candidate = 'Vehicle isA Any\nPassengerCar isA Vehicle\nSportsCar isA PassengerCar\nLuxuryCar isA PassengerCar\nFamilyCar isA PassengerCar\nSmallCars isA PassengerCar\nSUV isA PassengerCar\nPetrolCar isA PassengerCar\nDieselCar isA PassengerCar\nBEV isA PassengerCar\nCNGCar isA PassengerCar\nHEV isA PassengerCar\nPHEV isA PassengerCar\nAlternateFuelCar isA PassengerCar\nPassengerCar imports Drivetrains, Frame, Chassis, LubricationSystems, Sensors\nPassengerCar hasA\nnoAutomation: NoAutomation,\ndriverAssistance: DriverAssistance,\npartialAutomation: PartialAutomation,\nconditionalAutomation: ConditionalAutomation,\nhighAutomation: HighAutomation,\nfullAutomation: FullAutomation EOF'
+reference = 'Vehicle isA Any\nPassengerCar isA Vehicle\nSportsCar isA PassengerCar\nLuxuryCar isA PassengerCar\nFamilyCar isA PassengerCar\nSmallCars isA PassengerCar\nSUV isA PassengerCar\nPetrolCar isA PassengerCar\nDieselCar isA PassengerCar\nBEV isA PassengerCar\nCNGCar isA PassengerCar\nHEV isA PassengerCar\nPHEV isA PassengerCar\nAlternateFuelCar isA PassengerCar\nPassengerCar imports Drivetrains, Frame, Chassis, LubricationSystems, Sensors\nPassengerCar hasA\nnoAutomation: NoAutomation EOF'
 
 weighted_ngram_match_score = weighted_bleu(reference,candidate=candidate,max_n=4)
 ngram_match_score = compute_code_bleu(reference,candidate)
