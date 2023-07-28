@@ -74,4 +74,21 @@ def syntax_match():
 
 g1 = lark_parser.parse ("Vehicle isA Any\nPassengerCar isA Vehicle\nSportsCar isA PassengerCar\nLuxuryCar isA PassengerCar\nFamilyCar isA PassengerCar\nSmallCars isA PassengerCar\nSUV isA PassengerCar\nPetrolCar isA PassengerCar\nDieselCar isA PassengerCar\nBEV isA PassengerCar\nCNGCar isA PassengerCar\nHEV isA PassengerCar\nPHEV isA PassengerCar\nAlternateFuelCar isA PassengerCar\nPassengerCar imports Drivetrains, Frame, Chassis, LubricationSystems, Sensors\nPassengerCar hasA\nnoAutomation: NoAutomation,\ndriverAssistance: DriverAssistance,\npartialAutomation: PartialAutomation,\nconditionalAutomation: ConditionalAutomation,\nhighAutomation: HighAutomation,\nfullAutomation: FullAutomation EOF")
 
-print ("parser", g1)
+
+
+#print ("parser", g1)
+
+class TreeVisitor(Visitor):
+    def __init__(self):
+        self.subtrees = []
+
+    def __default__(self, tree):
+        #subtree = Tree(data, children)
+        self.subtrees.append(tree)
+
+tree_visitor = TreeVisitor()
+tree_visitor.visit(g1)
+
+# Now tree_visitor.subtrees contains all the subtrees
+for subtree in tree_visitor.subtrees:
+    print("subtree: ", subtree, "\n")

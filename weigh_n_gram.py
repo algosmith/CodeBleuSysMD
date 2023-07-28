@@ -32,6 +32,10 @@ def brevity_penalty(reference, candidate):
     else:
         return np.exp(1 - len(ref_words) / len(cand_words))
 
-def bleu(reference, candidate, max_n):
+def weighted_bleu(reference, candidate, max_n):
     precisions = [weighted_precision(reference, candidate, n) for n in range(1, max_n + 1)]
     return brevity_penalty(reference, candidate) * np.exp(np.mean(np.log(precisions)))
+
+
+if __name__ == '__main__':
+    pass
