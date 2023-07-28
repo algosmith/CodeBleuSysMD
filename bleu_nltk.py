@@ -18,8 +18,8 @@ def compute_code_bleu(candidate_code, reference_code):
 
 if __name__ == '__main__':
     # Use the function
-    candidate_code = 'print("Hello, World!")'.split()
-    reference_code = 'print("Hello, World!")'.split()
+    candidate_code = 'LaptopParts::Keyboard hasA\nValue layout: String = \"QWERTY\",\nValue backlight: Boolean = true,\nValue language: String = \"English-US\".'.split()
+    reference_code = 'LaptopParts::Keyboard hasA\nValue layout: String = \"QWERTY\",\nValue backlight: Boolean = true,\nValue language: String = \"English-US\".'.split()
 
     score = compute_code_bleu(candidate_code, reference_code)
     print(f"CodeBLEU score: {score}")

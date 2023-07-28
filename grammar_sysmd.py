@@ -1,43 +1,77 @@
-from lark import Lark, Transformer, v_args
+from lark import Lark, Transformer, v_args, Visitor, Tree
 
-car_parts_grammar = """
-    start: statement*
+grammar = '''
+    start: sysmd "EOF"
 
-    statement: entity "hasA" attribute*
+    sysmd: (element | triple | package)*
 
-    entity: "CarBodyParts::" car_part_name
+    element: "define" definition
+           | "attribute" attribute
+           | "assoc" association
 
-    car_part_name: IDENTIFIER
+    triple: identification triple_types
 
-    attribute: "Value" attribute_name ":" attribute_type "=" attribute_value ","
+    definition: identification "isA" (qualified_name | relationship_definition)
 
-    attribute_name: IDENTIFIER
+    attribute: ("Value"? qualified_name ":")? multiplicity? qualified_name ("=" STRING)?
 
-    attribute_type: "String" | "Boolean" | "Real(" range ")" "[" UNIT "]"
+    association: identification "hasA" qualified_name_list
 
-    range: NUMBER ".." NUMBER
+    triple_types: "isA" qualified_name
+                | "hasA" qualified_name_list
+                | "uses" qualified_name_list
+                | "imports" qualified_name_list
+                | "defines" definition_list
 
-    attribute_value: STRING | BOOLEAN | NUMBER
+    relationship_definition: CNAME qualified_name "from" qualified_name multiplicity "to" qualified_name multiplicity
 
-    IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
-    UNIT: /[a-zA-Z_][a-zA-Z0-9_]*/
-    STRING: /"[^"\\\\]*"|\\\\.*/ 
-    NUMBER: /\d+/ 
-    BOOLEAN: "true" | "false" 
+    package: "Package" CNAME "{" element* "}"
 
-    %import common.WS 
+    identification: simple_name*
+                  
+
+    simple_name: CNAME
+
+    qualified_name: CNAME ("::" CNAME)* | CNAME ":" CNAME
+
+    multiplicity: "[" (SIGNED_INT | FLOAT) ("," (SIGNED_INT | FLOAT))? "]"
+
+    integer_literal: SIGNED_INT
+
+    real_literal: FLOAT
+
+    element_list: element ("," element)*
+
+    qualified_name_list: qualified_name ("," qualified_name)*
+
+    definition_list: definition (";" definition)*
+
+    STRING: /".*?"/
+
+    %import common.CNAME
+    %import common.SIGNED_INT
+    %import common.FLOAT
+    %import common.WS
     %ignore WS
+'''
 
-"""
 
-class CarPartsTransformer(Transformer):
+class SysMDTransformer(Transformer):
     pass
     # implement transformation methods here
 
-car_parts_parser = Lark(car_parts_grammar, parser='lalr', transformer=CarPartsTransformer())
+lark_parser = Lark(grammar, start='start', parser='lalr', transformer=SysMDTransformer())
 
-print (car_parts_parser)
+#tree = lark_parser.parse("your_string_here")
 
-g = car_parts_parser.parse ('CarBodyParts::RoofRack hasA\nValue capacity: String = \"new value\",\nValue material: String = \"Aluminum\",\nValue attachmentMethod: String = \"Clamp-on\",')
 
-print ("parser", g)
+
+def syntax_match():
+    pass
+
+
+#g = lark_parser.parse ('CarBodyParts::RoofRack hasA\nValue capacity: String = \"new value\",\nValue material: String = \"Aluminum\",\nValue attachmentMethod: String = \"Clamp-on\",')
+
+g1 = lark_parser.parse ("Vehicle isA Any\nPassengerCar isA Vehicle\nSportsCar isA PassengerCar\nLuxuryCar isA PassengerCar\nFamilyCar isA PassengerCar\nSmallCars isA PassengerCar\nSUV isA PassengerCar\nPetrolCar isA PassengerCar\nDieselCar isA PassengerCar\nBEV isA PassengerCar\nCNGCar isA PassengerCar\nHEV isA PassengerCar\nPHEV isA PassengerCar\nAlternateFuelCar isA PassengerCar\nPassengerCar imports Drivetrains, Frame, Chassis, LubricationSystems, Sensors\nPassengerCar hasA\nnoAutomation: NoAutomation,\ndriverAssistance: DriverAssistance,\npartialAutomation: PartialAutomation,\nconditionalAutomation: ConditionalAutomation,\nhighAutomation: HighAutomation,\nfullAutomation: FullAutomation EOF")
+
+print ("parser", g1)

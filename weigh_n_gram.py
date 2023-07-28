@@ -1,24 +1,37 @@
-from nltk import ngrams
+import nltk
 from collections import Counter
+import numpy as np
 
-def weighted_ngram_match(seq1, seq2, n):
-    # Generate n-grams for each sequence
-    ngrams1 = Counter(ngrams(seq1, n))
-    ngrams2 = Counter(ngrams(seq2, n))
+KEYWORDS = set(['def', 'for', 'while', 'if', 'else', 'class', 'try', 'except'])  # Replace with your keywords
 
-    # Compute the weighted intersection of n-grams
-    intersection = ngrams1 & ngrams2
-    intersection_count = sum((count * len(gram)) for gram, count in intersection.items())
+def ngram_counts(code, n):
+    words = nltk.word_tokenize(code)
+    return Counter(nltk.ngrams(words, n))
 
-    # Compute the total weighted count of n-grams
-    total_count = sum((count * len(gram)) for gram, count in ngrams1.items()) + sum((count * len(gram)) for gram, count in ngrams2.items())
+def weighted_precision(reference, candidate, n):
+    ref_counts = ngram_counts(reference, n)
+    cand_counts = ngram_counts(candidate, n)
 
-    # Return the weighted Jaccard index
-    return intersection_count / total_count if total_count != 0 else 0
+    match_count = 0
+    total_count = 0
+    for ngram, count in cand_counts.items():
+        total_count += count
+        match_count += min(count, ref_counts[ngram]) * ngram_weight(ngram)
 
+    return match_count / total_count if total_count > 0 else 0
 
+def ngram_weight(ngram):
+    return 1.5 if any(word in KEYWORDS for word in ngram) else 1
 
-if __name__ == '__main__':
-    seq1 = ["CarBodyParts::SideMirror", "hasA", "Value", "visibility:", "String", "=", "\"Wide-angle\""]
-    seq2 = ["CarBodyParts::SideMirror", "hasA", "Value", "visibility:", "String", "=", "\"Wide-angle\""]
-    print(weighted_ngram_match(seq1, seq2, 2))  # This would output 1.0, since seq1 and seq2 are identical
+def brevity_penalty(reference, candidate):
+    ref_words = nltk.word_tokenize(reference)
+    cand_words = nltk.word_tokenize(candidate)
+
+    if len(cand_words) > len(ref_words):
+        return 1
+    else:
+        return np.exp(1 - len(ref_words) / len(cand_words))
+
+def bleu(reference, candidate, max_n):
+    precisions = [weighted_precision(reference, candidate, n) for n in range(1, max_n + 1)]
+    return brevity_penalty(reference, candidate) * np.exp(np.mean(np.log(precisions)))
