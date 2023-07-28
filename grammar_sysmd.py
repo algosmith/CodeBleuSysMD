@@ -91,4 +91,35 @@ tree_visitor.visit(g1)
 
 # Now tree_visitor.subtrees contains all the subtrees
 for subtree in tree_visitor.subtrees:
-    print("subtree: ", subtree, "\n")
+    #print("subtree: ", subtree, "\n")
+    pass
+
+def corpus_syntax_match(reference, candidate):
+    """
+    Compute the corpus syntax match score.
+    
+    :param reference: The reference code as a list of tokens.
+    :param candidate: The generated code as a list of tokens.
+    :return: The corpus syntax match score.
+    """
+    # We use the smoothing function to avoid division by zero
+    #smoothing = SmoothingFunction().method1
+
+    #return sentence_bleu([reference], candidate, smoothing_function=smoothing)
+    candidate_tree = lark_parser.parse(candidate)
+    reference_tree = lark_parser.parse(reference)
+    candidate_tree_visitor = TreeVisitor()
+    candidate_tree_visitor.visit(candidate_tree)
+    reference_tree_visitor = TreeVisitor()
+    reference_tree_visitor.visit(reference_tree)
+
+    # compare all the subtrees of candidate_tree with all the subtrees of reference_tree
+    # and return the number of matches
+    match_count = 0
+    for candidate_subtree in candidate_tree_visitor.subtrees:
+        for reference_subtree in reference_tree_visitor.subtrees:
+            if candidate_subtree == reference_subtree:
+                match_count += 1
+                break
+    
+    return match_count / len(candidate_tree_visitor.subtrees) if len(candidate_tree_visitor.subtrees) > 0 else 0

@@ -1,7 +1,12 @@
+import nltk
 from nltk.translate.bleu_score import sentence_bleu
 from nltk.translate.bleu_score import SmoothingFunction
 
-def compute_code_bleu(candidate_code, reference_code):
+nltk.download('punkt')
+nltk.download('stopwords')
+
+
+def compute_code_bleu(reference_code, candidate_code):
     """
     Compute the CodeBLEU score.
     
@@ -10,6 +15,8 @@ def compute_code_bleu(candidate_code, reference_code):
     :return: The CodeBLEU score.
     """
     # We use the smoothing function to avoid division by zero
+    candidate_code = candidate_code.split()
+    reference_code = reference_code.split()
     smoothing = SmoothingFunction().method1
 
     return sentence_bleu([reference_code], candidate_code, smoothing_function=smoothing)
